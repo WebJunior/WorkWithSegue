@@ -12,23 +12,32 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var loginTF: UITextField!
     @IBOutlet weak var passwordTF: UITextField!
     
-    private let login = "admin"
-    private let password = "12345"
+    private let user = User.getUserData()
     
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let welcomeVC = segue.destination as? WelcomeViewController else { return }
-        welcomeVC.userLogin = login
+        guard let tabBarController = segue.destination as? UITabBarController else { return }
+        guard let viewControllers = tabBarController.viewControllers else { return }
+        
+        for viewController in viewControllers {
+            if let welcomeVC = viewController as? WelcomeViewController {
+                welcomeVC.user = user
+            } else if let navigationVC = viewController as? UINavigationController {
+                let userInfoVC = navigationVC.topViewController as! UserInfoViewController
+                userInfoVC.user = user
+            }
+        }
+        
         
     }
     
     
     @IBAction func forgotUsernameBtn() {
-        createAlert(title: "Your login 🤫", text: login)
+        createAlert(title: "Your login 🤫", text: user.login)
     }
     
     @IBAction func forgotPasswordBtn() {
-        createAlert(title: "Your password 🤫", text: password)
+        createAlert(title: "Your password 🤫", text: user.password)
     }
     
     private func createAlert(title: String, text: String) {
@@ -44,8 +53,8 @@ class LoginViewController: UIViewController {
         present(alert, animated: true)
     }
     @IBAction func loginPressedBtn() {
-        if loginTF.text != login || passwordTF.text != password {
-            createAlert(title: "❌❌❌❌❌", text: "login or password wrong")
+        if loginTF.text != user.login || passwordTF.text != user.password {
+            createAlert(title: "❌❌❌❌❌", text: "Login or password wrong")
             passwordTF.text = ""
         }
     }
